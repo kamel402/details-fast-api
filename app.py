@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import math
 from sklearn import preprocessing
-from utils import rfm
+from utils import rfm, discount
 # 2. Create the app object
 app = FastAPI()
 
@@ -14,8 +14,7 @@ app = FastAPI()
 async def index():
     return {'message': 'Wellcom'}
 
-# 3. Expose the prediction functionality, make a prediction from the passed
-#    JSON data and return the predicted customer segment
+# RFM Classification endpoint
 @app.post('/rfm')
 async def rfm_classification(file:UploadFile = File(...)):
     try:
@@ -46,6 +45,39 @@ async def rfm_classification(file:UploadFile = File(...)):
     data = df.to_json(orient='records')
 
     return data
+
+# Discount Classification endpoint
+@app.post('/discount')
+async def discount_classification(file:UploadFile = File(...)):
+    try:
+        df = pd.read_csv(file.file)
+    except:
+        raise HTTPException(
+            status_code= 404,
+            detail= 'Not csv file'
+        )    
+    
+    # Calculate the frequency
+    df = discount.calculate_frequency(df)
+    # Gets transaction with discounts only
+    df = discount.is_discount(df)
+    # Calculate number of discounts
+    df = discount.calculate_number_of_discounts(df)
+    # Calculate amount of discount
+    df = discount.calculate_amount_of_discount(df)
+    # Calculate the amount
+    df = discount.calculate_amount(df)
+    # Calculate discounts percentege
+    df = discount.calculate_discounts_percentege(df)
+    # Create discount segment
+    df = discount.calculate_discount_segment(df)
+    # Drop unnecessary column
+    df = discount.drop_unnecessary_column(df)
+    # Convert Dataframe to json format 
+    data = df.to_json(orient='records')
+    return data
+
+
     
 
 # 5. Run the API with uvicorn
