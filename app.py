@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import math
 from sklearn import preprocessing
-from utils import rfm, discount, time
+from utils import rfm, discount, time, season
 # 2. Create the app object
 app = FastAPI()
 
@@ -107,7 +107,38 @@ async def time_classification(file:UploadFile = File(...)):
 
     # Convert Dataframe to json format 
     data = df.to_json(orient='records')
-    df.to_csv('time_dataframe.csv', index=False)
+    return data
+
+# Season Classification endpoint
+@app.post('/season')
+async def season_classification(file:UploadFile = File(...)):
+    try:
+        df = pd.read_csv(file.file)
+    except:
+        raise HTTPException(
+            status_code= 404,
+            detail= 'Not csv file'
+        )    
+    
+    # Calculate the frequency
+    df = season.calculate_frequency(df)
+    # Convert Gregorian date to Hijri date
+    df = season.convert_date_to_hijri(df)
+    # Calculate perchuse only in Eid Al-Fitr
+    df = season.calculate_only_fitr_purchase(df)
+    # Calculate perchuse only in Eid Al-Adha
+    df = season.calculate_only_adha_purchase(df)
+    # Calculate perchuse only in Eid al-Adha and al-Fitr
+    df = season.calculate_both_eid_purchase(df)
+    # Calculate perchuse in all season
+    df = season.calculate_all_season_purchase(df)
+    # Rename features
+    df = season.rename_features(df)
+    # Calculate season segment
+    df = season.calculate_season_segment(df)
+
+    # Convert Dataframe to json format 
+    data = df.to_json(orient='records')
     return data
     
 
