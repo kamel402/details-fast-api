@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import math
 from sklearn import preprocessing
-from utils import rfm, discount
+from utils import rfm, discount, time
 # 2. Create the app object
 app = FastAPI()
 
@@ -77,7 +77,38 @@ async def discount_classification(file:UploadFile = File(...)):
     data = df.to_json(orient='records')
     return data
 
+# Time Classification endpoint
+@app.post('/time')
+async def time_classification(file:UploadFile = File(...)):
+    try:
+        df = pd.read_csv(file.file)
+    except:
+        raise HTTPException(
+            status_code= 404,
+            detail= 'Not csv file'
+        )    
+    
+    # Calculate the invoice hour
+    df = time.calculate_invoice_hour(df)
+    # Calculate the frequency
+    df = time.calculate_frequency(df)
+    # Label morning purchases
+    df = time.label_morning_purchase(df)
+    # Label night purchases
+    df = time.label_night_purchase(df)
+    # Calculate the total number of purchases at the morning
+    df = time.calculate_morning_purchase(df)
+    # Calculate the total number of purchases at the night
+    df = time.calculate_night_purchase(df)
+    # Create time segment
+    df = time.calculate_time_segment(df)
+    # Drop unnecessary column
+    df = time.drop_unnecessary_column(df)
 
+    # Convert Dataframe to json format 
+    data = df.to_json(orient='records')
+    df.to_csv('time_dataframe.csv', index=False)
+    return data
     
 
 # 5. Run the API with uvicorn
