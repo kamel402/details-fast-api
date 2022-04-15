@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import math
 from sklearn import preprocessing
-from utils import rfm, discount, time, season
+from utils import rfm, discount, time, season, basket
 # 2. Create the app object
 app = FastAPI()
 
@@ -139,6 +139,28 @@ async def season_classification(file:UploadFile = File(...)):
 
     # Convert Dataframe to json format 
     data = df.to_json(orient='records')
+    return data
+
+# Basket Analysis endpoint
+@app.post('/basket')
+async def basket_analysis(file:UploadFile = File(...)):
+    try:
+        df = pd.read_csv(file.file)
+    except:
+        raise HTTPException(
+            status_code= 404,
+            detail= 'Not csv file'
+        )    
+    
+    # Generate transactions
+    transactions = basket.generate_transactions(df)
+    # Calculate frequent itemsets
+    frequent_itemsets = basket.calculate_frequent_itemsets(transactions)
+    # Generate association rules
+    rules = basket.generate_rules(frequent_itemsets)
+    
+    # Convert Dataframe to json format 
+    data = rules.to_json(orient='records')
     return data
     
 
