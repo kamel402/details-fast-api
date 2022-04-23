@@ -42,7 +42,7 @@ async def rfm_classification(file:UploadFile = File(...)):
     # Unite payment methods
     df = rfm.calculate_payment_method(df)
     # Convert Dataframe to json format 
-    data = df.to_json(orient='records')
+    data = df.to_json(orient='records', force_ascii=False)
 
     return data
 
@@ -74,7 +74,7 @@ async def discount_classification(file:UploadFile = File(...)):
     # Drop unnecessary column
     df = discount.drop_unnecessary_column(df)
     # Convert Dataframe to json format 
-    data = df.to_json(orient='records')
+    data = df.to_json(orient='records', force_ascii=False)
     return data
 
 # Time Classification endpoint
@@ -106,7 +106,7 @@ async def time_classification(file:UploadFile = File(...)):
     df = time.drop_unnecessary_column(df)
 
     # Convert Dataframe to json format 
-    data = df.to_json(orient='records')
+    data = df.to_json(orient='records', force_ascii=False)
     return data
 
 # Season Classification endpoint
@@ -138,7 +138,7 @@ async def season_classification(file:UploadFile = File(...)):
     df = season.calculate_season_segment(df)
 
     # Convert Dataframe to json format 
-    data = df.to_json(orient='records')
+    data = df.to_json(orient='records', force_ascii=False)
     return data
 
 # Basket Analysis endpoint
@@ -160,7 +160,7 @@ async def basket_analysis(file:UploadFile = File(...)):
     rules = basket.generate_rules(frequent_itemsets)
     
     # Convert Dataframe to json format 
-    data = rules.to_json(orient='records')
+    data = rules.to_json(orient='records', force_ascii=False)
     return data
     
 
