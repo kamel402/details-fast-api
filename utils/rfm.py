@@ -3,7 +3,6 @@ import datetime
 import math
 import numpy as np
 
-
 def calculate_recency(df):
     df['InvoiceDate'] = pd.to_datetime(df['InvoiceDate'])
     refrence_date = df['InvoiceDate'].max() + datetime.timedelta(days = 1)
