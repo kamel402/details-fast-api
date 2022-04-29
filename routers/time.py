@@ -40,4 +40,5 @@ async def time_classification(path: schemas.path.Path):
 
     # Convert Dataframe to json format
     data = df.to_json(orient='records', force_ascii=False)
+    print(data)
     return data

@@ -30,7 +30,6 @@ async def basket_analysis(path: schemas.path.Path):
     frequent_itemsets = basket.calculate_frequent_itemsets(transactions)
     # Generate association rules
     rules = basket.generate_rules(frequent_itemsets)
-
     # Convert Dataframe to json format
-    data = rules.to_json(orient='records')
+    data = rules.to_json(orient='records', force_ascii=False)
     return data

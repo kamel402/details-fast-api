@@ -34,8 +34,7 @@ def generate_rules(frequent_itemsets, min_threshold=0.3):
     rules = rules.sort_values(['support', 'confidence', 'lift'],ascending=False)
     rules = rules.reset_index()
     rules.drop(['index'], axis=1, inplace=True)
-    rules = rules[['antecedents','consequents', 'support', 'confidence','lift']]
+    rules = rules[['antecedents','consequents', 'support', 'confidence']]
     rules['antecedents'] =  rules['antecedents'].apply(lambda row: to_list(row))
-    rules['consequents'] =  rules['consequents'].apply(lambda row: to_list(row))
-
+    rules['consequents'] =  rules['consequents'].apply(lambda row: to_list(row))    
     return rules

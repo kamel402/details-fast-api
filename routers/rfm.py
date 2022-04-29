@@ -37,7 +37,8 @@ async def rfm_classification(path: schemas.path.Path):
     df = rfm.calculate_city(df)
     # Unite payment methods
     df = rfm.calculate_payment_method(df)
+    # Drop unnecessary columns
+    df = rfm.drop_unnecessary_columns(df)
     # Convert Dataframe to json format
     data = df.to_json(orient='records', force_ascii=False)
-
     return data

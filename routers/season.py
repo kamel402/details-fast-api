@@ -12,9 +12,9 @@ router = APIRouter(
 
 
 @router.post('/')
-async def season_classification(file: UploadFile = File(...)):
+async def season_classification(path: schemas.path.Path):
     try:
-        df = pd.read_csv(file.file)
+        df = pd.read_csv(path.path)
     except:
         raise HTTPException(
             status_code=404,
