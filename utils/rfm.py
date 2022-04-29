@@ -3,11 +3,9 @@ import datetime
 import math
 import numpy as np
 
-
 def calculate_recency(df):
     df['InvoiceDate'] = pd.to_datetime(df['InvoiceDate'])
     refrence_date = df['InvoiceDate'].max() + datetime.timedelta(days = 1)
-    print('Reference Date:', refrence_date)
     df['days_since_last_purchase'] = (refrence_date - df['InvoiceDate']).astype('timedelta64[D]')
     customer_history_df =  df[['CustomerID', 'CustmerName', 'days_since_last_purchase']].groupby("CustomerID").min().reset_index()
     customer_history_df.rename(columns={'days_since_last_purchase':'recency'}, inplace=True)
@@ -129,3 +127,5 @@ def calculate_payment_method(df):
     df = df.merge(payment_df)
     return df
 
+def drop_unnecessary_columns(df):
+    return df[['CustomerID', 'CustmerName', 'recency', 'frequency', 'amount', 'RFM_score', 'general_segment', 'city', 'payment_method']]
