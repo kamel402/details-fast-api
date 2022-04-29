@@ -17,6 +17,7 @@ app.include_router(time.router)
 async def index():
     return {'message': 'try to open http://127.0.0.1:8000/docs to try the API'}
 
+
 # 4. Run the API with uvicorn
 #    Will run on http://127.0.0.1:9000
 if __name__ == '__main__':
