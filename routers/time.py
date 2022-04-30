@@ -1,7 +1,7 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, UploadFile, File
 import pandas as pd
 
-from utils import time
+from utils import time, exeptions
 import schemas.path
 
 router = APIRouter(
@@ -12,14 +12,11 @@ router = APIRouter(
 
 
 @router.post('/')
-async def time_classification(path: schemas.path.Path):
+async def time_classification(file: UploadFile = File(...)):
     try:
-        df = pd.read_csv(path.path)
+        df = pd.read_excel(file.file)
     except:
-        raise HTTPException(
-            status_code=404,
-            detail='Not csv file'
-        )
+        raise exeptions.not_valid_file
 
     # Calculate the invoice hour
     df = time.calculate_invoice_hour(df)

@@ -1,9 +1,9 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, UploadFile, File
 from numpy import number
 import pandas as pd
 
 import schemas.path
-from utils import basket
+from utils import basket, exeptions
 
 
 router = APIRouter(
@@ -15,14 +15,11 @@ router = APIRouter(
 
 
 @router.post('/')
-async def basket_analysis(path: schemas.path.Path):
+async def basket_analysis(file: UploadFile = File(...)):
     try:
-        df = pd.read_csv(path.path)
+        df = pd.read_excel(file.file)
     except:
-        raise HTTPException(
-            status_code=404,
-            detail='Not csv file'
-        )
+        raise exeptions.not_valid_file
 
     # Generate transactions
     transactions = basket.generate_transactions(df)

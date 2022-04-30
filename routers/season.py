@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, UploadFile, File
 import pandas as pd
 
-from utils import season
+from utils import season, exeptions
 import schemas.path
 
 router = APIRouter(
@@ -12,14 +12,11 @@ router = APIRouter(
 
 
 @router.post('/')
-async def season_classification(path: schemas.path.Path):
+async def season_classification(file: UploadFile = File(...)):
     try:
-        df = pd.read_csv(path.path)
+        df = pd.read_excel(file.file)
     except:
-        raise HTTPException(
-            status_code=404,
-            detail='Not csv file'
-        )
+        raise exeptions.not_valid_file
 
     # Calculate the frequency
     df = season.calculate_frequency(df)

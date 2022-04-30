@@ -1,7 +1,7 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, UploadFile, File
 import pandas as pd
 
-from utils import rfm
+from utils import rfm, exeptions
 import schemas.path
 
 router = APIRouter(
@@ -12,15 +12,13 @@ router = APIRouter(
 
 
 @router.post('/')
-async def rfm_classification(path: schemas.path.Path):
+async def rfm_classification(file: UploadFile = File(...)):
     try:
-        df = pd.read_csv(path.path)
+        df = pd.read_excel(file.file._file)
     except:
-        raise HTTPException(
-            status_code=404,
-            detail='Not csv file'
-        )
+        raise exeptions.not_valid_file
 
+    df = rfm.filter__data(df)
     # Calculating the rfm
     df = rfm.calculate_rfm(df)
     # Normlizing the rfm
@@ -40,5 +38,9 @@ async def rfm_classification(path: schemas.path.Path):
     # Drop unnecessary columns
     df = rfm.drop_unnecessary_columns(df)
     # Convert Dataframe to json format
+
+    df = df.head(10)
+    
     data = df.to_json(orient='records', force_ascii=False)
+
     return data

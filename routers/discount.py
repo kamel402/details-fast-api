@@ -1,7 +1,7 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, UploadFile, File
 import pandas as pd
 
-from utils import discount
+from utils import discount, exeptions
 import schemas.path
 
 router = APIRouter(
@@ -12,14 +12,11 @@ router = APIRouter(
 
 
 @router.post('/')
-async def discount_classification(path: schemas.path.Path):
+async def discount_classification(file: UploadFile = File(...)):
     try:
-        df = pd.read_csv(path.path)
+        df = pd.read_excel(file.file)
     except:
-        raise HTTPException(
-            status_code=404,
-            detail='Not csv file'
-        )
+        raise exeptions.not_valid_file
 
     # Calculate the frequency
     df = discount.calculate_frequency(df)
@@ -39,4 +36,5 @@ async def discount_classification(path: schemas.path.Path):
     df = discount.drop_unnecessary_column(df)
     # Convert Dataframe to json format
     data = df.to_json(orient='records', force_ascii=False)
+
     return data
