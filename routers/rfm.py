@@ -44,3 +44,4 @@ async def rfm_classification(file: UploadFile = File(...)):
     data = df.to_json(orient='records', force_ascii=False)
 
     return data
+
