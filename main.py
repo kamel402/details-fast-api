@@ -1,9 +1,11 @@
 import uvicorn ##ASGI
 from fastapi import FastAPI
-from routers import basket, discount, rfm, season, time
+from routers import basket, discount, rfm, season, time, store
 
 # 2. Create the app object
 app = FastAPI()
+
+app.include_router(store.router)
 
 app.include_router(basket.router)
 app.include_router(discount.router)

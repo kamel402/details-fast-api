@@ -1,7 +1,7 @@
 from fastapi import APIRouter, UploadFile, File
 import pandas as pd
 
-from utils import rfm, exeptions
+from utils import rfm, exeptions, preprocessing
 import schemas.path
 
 router = APIRouter(
@@ -18,7 +18,7 @@ async def rfm_classification(file: UploadFile = File(...)):
     except:
         raise exeptions.not_valid_file
 
-    df = rfm.filter__data(df)
+    df = preprocessing.filter_data(df)
     # Calculating the rfm
     df = rfm.calculate_rfm(df)
     # Normlizing the rfm

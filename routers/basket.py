@@ -1,5 +1,4 @@
 from fastapi import APIRouter, UploadFile, File
-from numpy import number
 import pandas as pd
 
 import schemas.path

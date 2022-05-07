@@ -3,19 +3,6 @@ import datetime
 import math
 import numpy as np
 
-def filter__data(df):
-    df = df[df['amount'] != 0]
-
-    df = df[df['OrderState'] != 'مسترجع']
-    df = df[df['OrderState'] != 'ملغي']
-    df = df[df['OrderState'] != 'بإنتظار المراجعة']
-
-    #df.dropna(subset = ['product_names'], inplace = True)
-
-    df['InvoiceDate']= pd.to_datetime(df['InvoiceDate'])
-
-    return df
-
 
 def calculate_recency(df):
     df['InvoiceDate'] = pd.to_datetime(df['InvoiceDate'])
