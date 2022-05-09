@@ -1,12 +1,27 @@
 import uvicorn ##ASGI
 from fastapi import FastAPI
 from routers import basket, discount, rfm, season, time, store
+from fastapi.middleware.cors import CORSMiddleware
 
 # 2. Create the app object
 app = FastAPI()
 
-app.include_router(store.router)
+origins = [
+    "http://localhost",
+    "http://localhost:8000",
+    "http://localhost:8080",
+    "http://localhost:3000",
+]
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.include_router(store.router)
 app.include_router(basket.router)
 app.include_router(discount.router)
 app.include_router(rfm.router)
