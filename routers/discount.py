@@ -14,7 +14,7 @@ router = APIRouter(
 @router.post('/')
 async def discount_classification(file: UploadFile = File(...)):
     try:
-        df = pd.read_excel(file.file)
+        df = pd.read_excel(file.file._file)
     except:
         raise exeptions.not_valid_file
 

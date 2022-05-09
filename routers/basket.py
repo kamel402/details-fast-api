@@ -16,7 +16,7 @@ router = APIRouter(
 @router.post('/')
 async def basket_analysis(file: UploadFile = File(...)):
     try:
-        df = pd.read_excel(file.file)
+        df = pd.read_excel(file.file._file)
     except:
         raise exeptions.not_valid_file
 
