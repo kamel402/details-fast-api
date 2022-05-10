@@ -1,5 +1,6 @@
 from fastapi import APIRouter, UploadFile, File
 import pandas as pd
+import json
 
 from utils import rfm, exeptions, preprocessing
 import schemas.path
@@ -38,10 +39,9 @@ async def rfm_classification(file: UploadFile = File(...)):
     # Drop unnecessary columns
     df = rfm.drop_unnecessary_columns(df)
     # Convert Dataframe to json format
-
-    df = df.head(10)
-    
     data = df.to_json(orient='records', force_ascii=False)
+
+    data = json.loads(data)
 
     return data
 

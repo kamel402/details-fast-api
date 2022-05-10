@@ -1,5 +1,6 @@
 from fastapi import APIRouter, UploadFile, File
 import pandas as pd
+import json
 
 from utils import time, exeptions
 import schemas.path
@@ -37,5 +38,7 @@ async def time_classification(file: UploadFile = File(...)):
 
     # Convert Dataframe to json format
     data = df.to_json(orient='records', force_ascii=False)
-    print(data)
+
+    data = json.loads(data)
+    
     return data

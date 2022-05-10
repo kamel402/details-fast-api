@@ -4,15 +4,15 @@ from mlxtend.frequent_patterns import fpgrowth
 from mlxtend.frequent_patterns import association_rules
 
 def generate_transactions(df):
-    items = list(df.Description.unique())
+    items = list(df.products.unique())
     grouped = df.groupby('InvoiceNo')
-    transaction_level = grouped.aggregate(lambda x: tuple(x)).reset_index()[['InvoiceNo','Description']]
+    transaction_level = grouped.aggregate(lambda x: tuple(x)).reset_index()[['InvoiceNo','products']]
     transaction_dict = {item:0 for item in items}
     output_dict = dict()
     temp = dict()
     for rec in transaction_level.to_dict('records'):
         invoice_num = rec['InvoiceNo']
-        items_list = rec['Description']
+        items_list = rec['products']
         transaction_dict = {item:0 for item in items}
         transaction_dict.update({item:1 for item in items if item in items_list})
         temp.update({invoice_num:transaction_dict})

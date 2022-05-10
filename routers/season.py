@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException, UploadFile, File
 import pandas as pd
+import json
 
 from utils import season, exeptions
 import schemas.path
@@ -37,4 +38,7 @@ async def season_classification(file: UploadFile = File(...)):
 
     # Convert Dataframe to json format
     data = df.to_json(orient='records', force_ascii=False)
+
+    data = json.loads(data)
+    
     return data

@@ -97,3 +97,16 @@ async def daily_sales(file: UploadFile = File(...)):
         np.int64) // 10 ** 6
 
     return {'daily_sales': [daily_sales.to_numpy().tolist()]}
+
+
+
+@router.post('/top_cities')
+async def top_cities(file: UploadFile = File(...)):
+    try:
+        df = pd.read_excel(file.file._file)
+    except:
+        raise exeptions.not_valid_file
+
+    df = preprocessing.filter_data(df)
+
+    return

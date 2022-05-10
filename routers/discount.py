@@ -1,5 +1,6 @@
 from fastapi import APIRouter, UploadFile, File
 import pandas as pd
+import json
 
 from utils import discount, exeptions
 import schemas.path
@@ -36,5 +37,7 @@ async def discount_classification(file: UploadFile = File(...)):
     df = discount.drop_unnecessary_column(df)
     # Convert Dataframe to json format
     data = df.to_json(orient='records', force_ascii=False)
+
+    data = json.loads(data)
 
     return data
