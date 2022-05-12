@@ -1,4 +1,6 @@
 from fastapi import APIRouter, UploadFile, File
+from typing import Optional
+import os
 import pandas as pd
 import json
 
@@ -13,9 +15,13 @@ router = APIRouter(
 
 
 @router.post('/')
-async def time_classification(file: UploadFile = File(...)):
+async def time_classification(limit: Optional[int] = None, file: UploadFile = File(...)):
     try:
-        df = pd.read_excel(file.file._file)
+        file_name, file_extension = os.path.splitext(file.filename)
+        if file_extension == ".xlsx":
+            df = pd.read_excel(file.file._file)
+        else :
+            df = pd.read_csv(file.file._file)
     except:
         raise exeptions.not_valid_file
 
@@ -37,7 +43,10 @@ async def time_classification(file: UploadFile = File(...)):
     df = time.drop_unnecessary_column(df)
 
     # Convert Dataframe to json format
-    data = df.to_json(orient='records', force_ascii=False)
+    if limit == None:
+        data = df.to_json(orient='records', force_ascii=False)
+    else:
+        data = df.head(limit).to_json(orient='records', force_ascii=False)
 
     data = json.loads(data)
     

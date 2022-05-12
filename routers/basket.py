@@ -1,5 +1,7 @@
 from fastapi import APIRouter, UploadFile, File
 import pandas as pd
+import json
+import os
 
 import schemas.path
 from utils import basket, exeptions
@@ -16,7 +18,11 @@ router = APIRouter(
 @router.post('/')
 async def basket_analysis(file: UploadFile = File(...)):
     try:
-        df = pd.read_excel(file.file._file)
+        file_name, file_extension = os.path.splitext(file.filename)
+        if file_extension == ".xlsx":
+            df = pd.read_excel(file.file._file)
+        else :
+            df = pd.read_csv(file.file._file)
     except:
         raise exeptions.not_valid_file
 
@@ -28,4 +34,7 @@ async def basket_analysis(file: UploadFile = File(...)):
     rules = basket.generate_rules(frequent_itemsets)
     # Convert Dataframe to json format
     data = rules.to_json(orient='records', force_ascii=False)
+    
+    data = json.loads(data)
+
     return data

@@ -2,6 +2,7 @@ from fastapi import APIRouter, UploadFile, File
 import pandas as pd
 import numpy as np
 import datetime
+import os
 
 from utils import exeptions, preprocessing
 
@@ -16,7 +17,11 @@ router = APIRouter(
 @router.post('/favorite_payment')
 async def favorite_payment(file: UploadFile = File(...)):
     try:
-        df = pd.read_excel(file.file._file)
+        file_name, file_extension = os.path.splitext(file.filename)
+        if file_extension == ".xlsx":
+            df = pd.read_excel(file.file._file)
+        else :
+            df = pd.read_csv(file.file._file)
     except:
         raise exeptions.not_valid_file
 
@@ -35,7 +40,11 @@ async def favorite_payment(file: UploadFile = File(...)):
 @router.post('/daily_orders')
 async def daily_orders(file: UploadFile = File(...)):
     try:
-        df = pd.read_excel(file.file._file)
+        file_name, file_extension = os.path.splitext(file.filename)
+        if file_extension == ".xlsx":
+            df = pd.read_excel(file.file._file)
+        else :
+            df = pd.read_csv(file.file._file)
     except:
         raise exeptions.not_valid_file
 
@@ -72,7 +81,11 @@ async def daily_orders(file: UploadFile = File(...)):
 @router.post('/daily_sales')
 async def daily_sales(file: UploadFile = File(...)):
     try:
-        df = pd.read_excel(file.file._file)
+        file_name, file_extension = os.path.splitext(file.filename)
+        if file_extension == ".xlsx":
+            df = pd.read_excel(file.file._file)
+        else :
+            df = pd.read_csv(file.file._file)
     except:
         raise exeptions.not_valid_file
 
@@ -103,7 +116,11 @@ async def daily_sales(file: UploadFile = File(...)):
 @router.post('/top_cities')
 async def top_cities(file: UploadFile = File(...)):
     try:
-        df = pd.read_excel(file.file._file)
+        file_name, file_extension = os.path.splitext(file.filename)
+        if file_extension == ".xlsx":
+            df = pd.read_excel(file.file._file)
+        else :
+            df = pd.read_csv(file.file._file)
     except:
         raise exeptions.not_valid_file
 
