@@ -1,6 +1,8 @@
 from fastapi import APIRouter, UploadFile, File
+from typing import Optional
 import pandas as pd
 import json
+import os
 
 from utils import rfm, exeptions, preprocessing
 import schemas.path
@@ -13,9 +15,13 @@ router = APIRouter(
 
 
 @router.post('/')
-async def rfm_classification(file: UploadFile = File(...)):
+async def rfm_classification(limit: Optional[int] = None, file: UploadFile = File(...)):
     try:
-        df = pd.read_excel(file.file._file)
+        file_name, file_extension = os.path.splitext(file.filename)
+        if file_extension == ".xlsx":
+            df = pd.read_excel(file.file._file)
+        else :
+            df = pd.read_csv(file.file._file)
     except:
         raise exeptions.not_valid_file
 
@@ -39,7 +45,10 @@ async def rfm_classification(file: UploadFile = File(...)):
     # Drop unnecessary columns
     df = rfm.drop_unnecessary_columns(df)
     # Convert Dataframe to json format
-    data = df.to_json(orient='records', force_ascii=False)
+    if limit == None:
+        data = df.to_json(orient='records', force_ascii=False)
+    else:
+        data = df.head(limit).to_json(orient='records', force_ascii=False)
 
     data = json.loads(data)
 
