@@ -1,8 +1,24 @@
-def calculate_frequency(df):
-    customer_history_df =  df[['CustmerName', 'CustomerID', 'InvoiceNo', 'amount', 'discount']].groupby("CustomerID").min().reset_index()
+def calculate_dicount(df):
+    customer_history_df =  df[['CustomerID', 'CustmerName']].groupby("CustomerID").min().reset_index()
     customer_freq = (df[['CustomerID', 'InvoiceNo']].groupby(["CustomerID", 'InvoiceNo']).count().reset_index()).groupby(["CustomerID"]).count().reset_index()
     customer_freq.rename(columns={'InvoiceNo':'frequency'},inplace=True)
     customer_history_df = customer_history_df.merge(customer_freq)
+
+    df['isDiscount'] = df.apply (lambda row: label_race(row), axis=1)
+
+    new_df = df.groupby(['CustomerID'])['isDiscount'].agg('sum').reset_index()
+    new_df.rename(columns={'isDiscount':'number_of_discounts'},inplace=True)
+    customer_history_df = customer_history_df.merge(new_df)
+
+    customer_discount_val = df[['CustomerID', 'discount']].groupby("CustomerID").sum().reset_index()
+    customer_history_df = customer_history_df.merge(customer_discount_val)
+
+    customer_discount_val = df[['CustomerID', 'amount']].groupby("CustomerID").sum().reset_index()
+    customer_history_df = customer_history_df.merge(customer_discount_val)
+
+    customer_history_df['percentege'] = (customer_history_df['number_of_discounts']/customer_history_df['frequency'])*100
+
+    print(customer_history_df['percentege'].max())
 
     return customer_history_df
 
@@ -11,30 +27,6 @@ def label_race(row):
         return 1
     else:
         return 0
-
-def is_discount(df):
-    df['isDiscount'] = df.apply (lambda row: label_race(row), axis=1)
-    return df
-
-def calculate_number_of_discounts(df):
-    new_df = df.groupby(['CustomerID'])['isDiscount'].agg('sum').reset_index()
-    new_df.rename(columns={'isDiscount':'number_of_discounts'},inplace=True)
-    customer_history_df = df.merge(new_df)
-    return customer_history_df
-
-def calculate_amount_of_discount(df):
-    customer_discount_val = df[['CustomerID', 'discount']].groupby("CustomerID").sum().reset_index()
-    customer_history_df = df.merge(customer_discount_val)
-    return customer_history_df
-
-def calculate_amount(df):
-    customer_discount_val = df[['CustomerID', 'amount']].groupby("CustomerID").sum().reset_index()
-    customer_history_df = df.merge(customer_discount_val)
-    return customer_history_df
-
-def calculate_discounts_percentege(df):
-    df['percentege'] = (df['number_of_discounts']/df['frequency'])*100
-    return df
 
 def category_label(row):
     if row['percentege'] >= 70 and row['frequency'] > 1:

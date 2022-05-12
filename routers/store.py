@@ -1,7 +1,6 @@
 from fastapi import APIRouter, UploadFile, File
 import pandas as pd
 import numpy as np
-import datetime
 import os
 
 from utils import exeptions, preprocessing
