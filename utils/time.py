@@ -6,10 +6,22 @@ def calculate_invoice_hour(df):
     return df
 
 def calculate_frequency(df):
-    customer_history_df =  df[['CustmerName', 'CustomerID', 'InvoiceNo', 'InvoiceDate', 'InvoiceHour']].groupby("CustomerID").min().reset_index()
+    customer_history_df =  df[['CustomerID', 'CustmerName']].groupby("CustomerID").min().reset_index()
     customer_freq = (df[['CustomerID', 'InvoiceNo']].groupby(["CustomerID", 'InvoiceNo']).count().reset_index()).groupby(["CustomerID"]).count().reset_index()
     customer_freq.rename(columns={'InvoiceNo':'frequency'},inplace=True)
     customer_history_df = customer_history_df.merge(customer_freq)
+
+    df['isMorning'] = df.apply (lambda row: morning_label(row), axis=1)
+
+    df['isNight'] = df.apply (lambda row: night_label(row), axis=1)
+
+    new_df = df.groupby(['CustomerID'])['isMorning'].agg('sum').reset_index()
+    new_df.rename(columns={'isMorning':'morning_purchase'},inplace=True)
+    customer_history_df = customer_history_df.merge(new_df)
+
+    new_df = df.groupby(['CustomerID'])['isNight'].agg('sum').reset_index()
+    new_df.rename(columns={'isNight':'night_purchase'},inplace=True)
+    customer_history_df = customer_history_df.merge(new_df)
 
     return customer_history_df
 
@@ -19,34 +31,11 @@ def morning_label(row):
     else:
         return 0
 
-def label_morning_purchase(df):
-    df['isMorning'] = df.apply (lambda row: morning_label(row), axis=1)
-    return df
-
 def night_label(row):
     if row['InvoiceHour'] >= 12:
         return 1
     else:
         return 0
-
-def label_night_purchase(df):
-    df['isNight'] = df.apply (lambda row: night_label(row), axis=1)
-    return df
-
-def calculate_morning_purchase(df):
-    new_df = df.groupby(['CustomerID'])['isMorning'].agg('sum').reset_index()
-    new_df.rename(columns={'isMorning':'morning_purchase'},inplace=True)
-    df.drop(["isMorning"],axis=1, inplace=True)
-    customer_history_df = df.merge(new_df)
-    return customer_history_df
-
-def calculate_night_purchase(df):
-    new_df = df.groupby(['CustomerID'])['isNight'].agg('sum').reset_index()
-    new_df.rename(columns={'isNight':'night_purchase'},inplace=True)
-    df.drop(["isNight"],axis=1, inplace=True)
-    customer_history_df = df.merge(new_df)
-
-    return customer_history_df
 
 def category_label(row):
     if row['morning_purchase'] > row['night_purchase']:

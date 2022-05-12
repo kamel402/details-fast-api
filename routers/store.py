@@ -1,7 +1,6 @@
 from fastapi import APIRouter, UploadFile, File
 import pandas as pd
 import numpy as np
-import datetime
 import os
 
 from utils import exeptions, preprocessing
@@ -27,7 +26,7 @@ async def favorite_payment(file: UploadFile = File(...)):
 
     df = preprocessing.filter_data(df)
 
-    fav_payment = df['payment_method'].value_counts() / df.shape[0] * 100
+    fav_payment = df['payment_method'].value_counts()
 
     fav_payment = np.array([fav_payment.index, fav_payment.astype(float)])
     fav_payment = np.transpose(fav_payment, axes=None)
