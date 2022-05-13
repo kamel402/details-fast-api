@@ -3,6 +3,8 @@ import re
 from mlxtend.preprocessing import TransactionEncoder
 from mlxtend.frequent_patterns import fpgrowth
 from mlxtend.frequent_patterns import association_rules
+import warnings
+warnings.filterwarnings("ignore")
 
 def generate_products(df):
     df = df[['CustomerID', 'CustmerName', 'OrderState', 'InvoiceNo', 'InvoiceDate', 'amount', 'products']]
