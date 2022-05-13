@@ -126,7 +126,10 @@ async def top_cities(file: UploadFile = File(...)):
 
     df = preprocessing.filter_data(df)
     cities = df['city'].value_counts()
-    return cities.to_dict()
+    cities = df['city'].value_counts().to_dict()
+    cities_list = list(cities.keys())
+    numbers = list(cities.values())
+    return {'cities': cities_list, 'numbers': numbers}
 
 @router.post('/overview')
 async def overview(file: UploadFile = File(...)):
