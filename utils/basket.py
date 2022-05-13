@@ -1,7 +1,46 @@
 import pandas as pd
+import re
 from mlxtend.preprocessing import TransactionEncoder
 from mlxtend.frequent_patterns import fpgrowth
 from mlxtend.frequent_patterns import association_rules
+
+def generate_products(df):
+    df = df[['CustomerID', 'CustmerName', 'OrderState', 'InvoiceNo', 'InvoiceDate', 'amount', 'products']]
+    
+    new_cs_df = pd.DataFrame(columns = ['InvoiceNo','CustomerID', 'CustmerName', 'products', 'Quantity'])
+
+    pattern1 = "\(SKU:(.*?)\)"
+    pattern2 = "\(Qty: (.*?)\)"
+    pattern3 = "KU:(.*?)\)"
+    for index, row in df.iterrows():
+        s = str(row['products']).split(', (S')
+        for item in s:
+            substirng1 = re.search(pattern1, item)
+            if substirng1:
+                substirng1 = re.search(pattern1, item).group(0)
+                item = item.replace(substirng1,'')
+                
+            substirng3 = re.search(pattern3, item)
+            if substirng3:
+                substirng3 = re.search(pattern3, item).group(0)
+                item = item.replace(substirng3,'')
+
+            substring2 = re.search(pattern2, item).group(1)
+            quantity = int(substring2)
+            substring2 = re.search(pattern2, item).group(0)
+            item = item.replace(substring2,'')
+            
+            item = item.strip()
+            d = {'InvoiceNo': row['InvoiceNo'], 'CustomerID': row['CustomerID'],'CustmerName': row['CustmerName'], 'products': item,'Quantity':quantity}
+            
+            new_cs_df = new_cs_df.append(d, ignore_index=True)
+    
+    new_cs_df.dropna(subset = ['products'], inplace = True)
+    new_cs_df = new_cs_df[new_cs_df['products'] != '']
+
+    products = new_cs_df.groupby(['InvoiceNo', 'CustomerID', 'CustmerName', 'products']).agg({'Quantity': 'sum'}).reset_index()
+
+    return products
 
 def generate_transactions(df):
     items = list(df.products.unique())

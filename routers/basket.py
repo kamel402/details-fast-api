@@ -4,7 +4,7 @@ import json
 import os
 
 import schemas.path
-from utils import basket, exeptions
+from utils import basket, exeptions, preprocessing
 
 
 router = APIRouter(
@@ -25,7 +25,11 @@ async def basket_analysis(file: UploadFile = File(...)):
             df = pd.read_csv(file.file._file)
     except:
         raise exeptions.not_valid_file
-
+    
+    # Preprocess data
+    df = preprocessing.filter_data(df)
+    # Generate products sheet
+    df = basket.generate_products(df)
     # Generate transactions
     transactions = basket.generate_transactions(df)
     # Calculate frequent itemsets

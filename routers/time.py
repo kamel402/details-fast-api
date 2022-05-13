@@ -4,7 +4,7 @@ import os
 import pandas as pd
 import json
 
-from utils import time, exeptions
+from utils import time, exeptions, preprocessing
 import schemas.path
 
 router = APIRouter(
@@ -24,7 +24,8 @@ async def time_classification(limit: Optional[int] = None, file: UploadFile = Fi
             df = pd.read_csv(file.file._file)
     except:
         raise exeptions.not_valid_file
-
+    
+    df = preprocessing.filter_data(df)
     # Calculate the invoice hour
     df = time.calculate_invoice_hour(df)
     # Calculate the frequency
@@ -63,6 +64,7 @@ async def time_classification(file: UploadFile = File(...)):
     except:
         raise exeptions.not_valid_file
 
+    df = preprocessing.filter_data(df)
     # Calculate the invoice hour
     df = time.calculate_invoice_hour(df)
     # Calculate the frequency

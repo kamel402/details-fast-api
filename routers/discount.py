@@ -4,7 +4,7 @@ import os
 import pandas as pd
 import json
 
-from utils import discount, exeptions
+from utils import discount, exeptions, preprocessing
 import schemas.path
 
 router = APIRouter(
@@ -25,6 +25,7 @@ async def discount_classification(limit: Optional[int] = None, file: UploadFile 
     except:
         raise exeptions.not_valid_file
 
+    df = preprocessing.filter_data(df)
     # Calculate the frequency
     df = discount.calculate_dicount(df)
     # Create discount segment
@@ -52,6 +53,7 @@ async def discount_classification(file: UploadFile = File(...)):
     except:
         raise exeptions.not_valid_file
 
+    df = preprocessing.filter_data(df)
     # Calculate the frequency
     df = discount.calculate_dicount(df)
     # Create discount segment

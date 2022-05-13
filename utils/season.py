@@ -18,7 +18,7 @@ def calculate_only_fitr_purchase(df):
     return df
 
 def calculate_only_adha_purchase(df):
-    df['onlyAdha'] = df['InvoiceDateHijri'].apply(lambda row: 1 if row.month == 10 else 0)
+    df['onlyAdha'] = df['InvoiceDateHijri'].apply(lambda row: 1 if row.month == 12 else 0)
     return df
 
 def both_eid(row, df):

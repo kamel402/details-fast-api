@@ -4,7 +4,7 @@ import os
 import pandas as pd
 import json
 
-from utils import season, exeptions
+from utils import season, exeptions, preprocessing
 import schemas.path
 
 router = APIRouter(
@@ -25,6 +25,7 @@ async def season_classification(limit: Optional[int] = None, file: UploadFile = 
     except:
         raise exeptions.not_valid_file
 
+    df = preprocessing.filter_data(df)
     # Calculate the frequency
     df = season.calculate_frequency(df)
     # Convert Gregorian date to Hijri date
@@ -64,6 +65,7 @@ async def season_classification(file: UploadFile = File(...)):
     except:
         raise exeptions.not_valid_file
 
+    df = preprocessing.filter_data(df)
     # Calculate the frequency
     df = season.calculate_frequency(df)
     # Convert Gregorian date to Hijri date
