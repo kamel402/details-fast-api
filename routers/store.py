@@ -4,12 +4,43 @@ import numpy as np
 import datetime
 import os
 
-from utils import exeptions, preprocessing
+from utils import exeptions, preprocessing, basket
 
 router = APIRouter(
     prefix='/store',
     tags=['store level']
 )
+
+
+@router.post('/overview')
+async def overview(file: UploadFile = File(...)):
+    try:
+        file_name, file_extension = os.path.splitext(file.filename)
+        if file_extension == ".xlsx":
+            df = pd.read_excel(file.file._file)
+        else :
+            df = pd.read_csv(file.file._file)
+    except:
+        raise exeptions.not_valid_file
+
+    df = preprocessing.filter_data(df)
+
+    # No. Customers
+    num_customers = len(df['CustomerID'].unique())
+
+    # No. Months
+    end_date = df.InvoiceDate.min()
+    start_date = datetime.datetime.now()
+    num_months = (start_date.year - end_date.year) * 12 + (start_date.month - end_date.month)
+
+    # Total sales
+    total_sales = int(df['amount'].sum())
+
+    # No. successful transactions
+    successful_transactions = len(df['InvoiceNo'])
+
+    return {'store_customer': num_customers, 'months_since_founded': num_months, 'total_sales': total_sales, 'successful_transactions':successful_transactions}
+
 
 # favorite payment method endpoint
 
@@ -133,8 +164,39 @@ async def top_cities(file: UploadFile = File(...)):
     numbers = numbers[0:10]
     return {'cities': cities_list, 'numbers': numbers}
 
-@router.post('/overview')
-async def overview(file: UploadFile = File(...)):
+
+@router.post('/top_products')
+async def top_10_products(file: UploadFile = File(...)):
+    try:
+        df = pd.read_csv('products.csv')
+    except:
+        try:
+            file_name, file_extension = os.path.splitext(file.filename)
+            if file_extension == ".xlsx":
+                df = pd.read_excel(file.file._file)
+            else :
+                df = pd.read_csv(file.file._file)
+        except:
+            raise exeptions.not_valid_file
+    
+        # Preprocess data
+        df = preprocessing.filter_data(df)
+        # Generate products sheet
+        df = basket.generate_products(df)
+    
+    
+
+    products = df['products'].value_counts()
+    products = df['products'].value_counts().to_dict()
+    products_list = list(products.keys())
+    products_list = products_list[0:10]
+    numbers = list(products.values())
+    numbers = numbers[0:10]
+
+    return {'products': list(products_list), 'numbers': list(numbers)}
+
+@router.post('/days_hours')
+async def days_hours(file: UploadFile = File(...)):
     try:
         file_name, file_extension = os.path.splitext(file.filename)
         if file_extension == ".xlsx":
@@ -146,18 +208,18 @@ async def overview(file: UploadFile = File(...)):
 
     df = preprocessing.filter_data(df)
 
-    # No. Customers
-    num_customers = len(df['CustomerID'].unique())
+    df['Invoicehour'] = df['InvoiceDate'].apply(lambda x: x.hour)
 
-    # No. Months
-    end_date = df.InvoiceDate.min()
-    start_date = datetime.datetime.now()
-    num_months = (start_date.year - end_date.year) * 12 + (start_date.month - end_date.month)
+    def search_1c(df, column1, value1):
+        return df[df[column1] == value1]
+    
+    x = range(0,24)
+    x = list(x)
+    y = []
+    for i in x:
+        count = int(search_1c(df, 'Invoicehour', i)['Invoicehour'].count())
+        y.append(count)
 
-    # Total sales
-    total_sales = int(df['amount'].sum())
+    return {'hours': x, 'counts': y}
 
-    # No. successful transactions
-    successful_transactions = len(df['InvoiceNo'])
-
-    return {'store_customer': num_customers, 'months_since_founded': num_months, 'total_sales': total_sales, 'successful_transactions':successful_transactions}
+    

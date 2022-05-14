@@ -41,6 +41,7 @@ def generate_products(df):
     new_cs_df = new_cs_df[new_cs_df['products'] != '']
 
     products = new_cs_df.groupby(['InvoiceNo', 'CustomerID', 'CustmerName', 'products']).agg({'Quantity': 'sum'}).reset_index()
+    products.to_csv("products.csv")
 
     return products
 

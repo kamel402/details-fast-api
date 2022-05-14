@@ -1,5 +1,6 @@
 from fastapi import APIRouter, UploadFile, File
 import pandas as pd
+
 import json
 import os
 
@@ -18,18 +19,21 @@ router = APIRouter(
 @router.post('/')
 async def basket_analysis(file: UploadFile = File(...)):
     try:
-        file_name, file_extension = os.path.splitext(file.filename)
-        if file_extension == ".xlsx":
-            df = pd.read_excel(file.file._file)
-        else :
-            df = pd.read_csv(file.file._file)
+        df = pd.read_csv('products.csv')
     except:
-        raise exeptions.not_valid_file
+        try:
+            file_name, file_extension = os.path.splitext(file.filename)
+            if file_extension == ".xlsx":
+                df = pd.read_excel(file.file._file)
+            else :
+                df = pd.read_csv(file.file._file)
+        except:
+            raise exeptions.not_valid_file
     
-    # Preprocess data
-    df = preprocessing.filter_data(df)
-    # Generate products sheet
-    df = basket.generate_products(df)
+        # Preprocess data
+        df = preprocessing.filter_data(df)
+        # Generate products sheet
+        df = basket.generate_products(df)
     # Generate transactions
     transactions = basket.generate_transactions(df)
     # Calculate frequent itemsets
