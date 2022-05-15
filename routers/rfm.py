@@ -196,15 +196,7 @@ async def rfm_classification(segment: int, file: UploadFile = File(...)):
     df = rfm.rfm_score(df)
     # Create a general segment
     df = rfm.calculate_general_segment(df)
-    # Unite cities
-    # df = rfm.calculate_city(df)
-    # # Unite payment methods
-    # df = rfm.calculate_payment_method(df)
-    # Drop unnecessary columns
-    # df = rfm.drop_unnecessary_columns(df)
-    # Convert Dataframe to json format
   
-
     if segment == 0:
         response = preprocessing.to_stream(df,'all_rfm')
     elif segment == 1:
