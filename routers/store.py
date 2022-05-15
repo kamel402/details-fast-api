@@ -140,7 +140,7 @@ async def daily_sales(file: UploadFile = File(...)):
     daily_sales['InvoiceDate'] = daily_sales.InvoiceDate.values.astype(
         np.int64) // 10 ** 6
 
-    return {'daily_sales': [daily_sales.to_numpy().tolist()]}
+    return {'daily_sales': daily_sales.to_numpy().tolist()}
 
 
 
