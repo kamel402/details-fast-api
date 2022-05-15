@@ -1,8 +1,10 @@
 from fastapi import APIRouter, UploadFile, File
 from typing import Optional
+import datetime
 import pandas as pd
 import json
 import os
+import numpy as np
 
 from utils import rfm, exeptions, preprocessing
 import schemas.path
@@ -93,4 +95,80 @@ async def rfm_classification(file: UploadFile = File(...)):
     data = json.loads(data)
 
     return data
+
+@router.post('/monthly')
+async def rfm_classification(file: UploadFile = File(...)):
+    try:
+        file_name, file_extension = os.path.splitext(file.filename)
+        if file_extension == ".xlsx":
+            df = pd.read_excel(file.file._file)
+        else :
+            df = pd.read_csv(file.file._file)
+    except:
+        raise exeptions.not_valid_file
+
+    df = preprocessing.filter_data(df)
+
+    # calclaute days_since_last_purchase for all the records on the original data frame
+    refrence_date = df.InvoiceDate.max() + datetime.timedelta(days = 1)
+    df['days_since_last_purchase'] = (refrence_date - df.InvoiceDate).astype('timedelta64[D]')
+
+    # set the days on the date to 1
+    df['MonthDate'] = df['InvoiceDate'].dt.to_period('M').dt.to_timestamp()
+
+    # find all the dates 
+    months = df['MonthDate'].unique()
+
+
+
+    # how many months do we have ?
+    number_of_months = months.size
+
+    minmax = rfm.find_max_min(df)
+
+    low_counts = []
+    Middle_counts = []
+    hight_counts = []
+
+    for i in range(number_of_months-1,-1,-1):
+        mask = df['MonthDate'] <= months[i]
+        masked_df = df.loc[mask]
+
+        # Calculating the rfm
+        masked_df = rfm.calculate_rfm(masked_df)
+        # Normlizing the rfm
+        masked_df = rfm.calculate_rfm_logs(masked_df)
+        # Divide rfm into 4 categories
+        masked_df = rfm.calculate_4_categories_minmax(masked_df, minmax)
+        # Create quartiles named RFM_segment
+        masked_df = rfm.rfm_segment(masked_df)
+        # Calculate rfm score by summing up the RFM quartile metrics
+        masked_df = rfm.rfm_score(masked_df)
+        # Create a general segment
+        masked_df = rfm.calculate_general_segment(masked_df)
+        
+        masked_df = masked_df.groupby(['general_segment'],as_index=False).agg({'CustomerID': 'count'}).rename(columns = {'CustomerID': 'count'})
+        print(masked_df['count'].iloc[0])
+        low_counts.append(int(masked_df['count'].iloc[0]))
+        if masked_df.shape[0] > 1:
+            Middle_counts.append(int(masked_df['count'].iloc[1]))
+        else:
+            Middle_counts.append(0)
+        
+        if masked_df.shape[0] > 2:
+            hight_counts.append(int(masked_df['count'].iloc[2]))
+        else:
+            hight_counts.append(0)
+        # hight_counts.append(int(masked_df['count'].iloc[2]))
+
+    months = np.flip(months.astype(np.int64) // 10 ** 6)
+    months = months.tolist()
+
+
+    return {
+        'low_counts':low_counts,
+        'Middle_counts':Middle_counts,
+        'hight_counts':hight_counts,
+        'months':months
+        }
 
