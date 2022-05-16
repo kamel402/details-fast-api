@@ -92,3 +92,42 @@ async def time_classification(file: UploadFile = File(...)):
     data = json.loads(data)
     
     return data
+
+@router.post('/download/{segment}')
+async def time_classification(segment: int, file: UploadFile = File(...)):
+    try:
+        file_name, file_extension = os.path.splitext(file.filename)
+        if file_extension == ".xlsx":
+            df = pd.read_excel(file.file._file)
+        else :
+            df = pd.read_csv(file.file._file)
+    except:
+        raise exeptions.not_valid_file
+    
+    df = preprocessing.filter_data(df)
+    # Calculate the invoice hour
+    df = time.calculate_invoice_hour(df)
+    # Calculate the frequency
+    df = time.calculate_frequency(df)
+    # Create time segment
+    df = time.calculate_time_segment(df)
+    # Drop unnecessary column
+
+    if segment == 0:
+        response = preprocessing.to_stream(df,'all_time')
+    elif segment == 1:
+        mask = df['Time_segment'] == 'صباح'
+        df = df.loc[mask]
+        response = preprocessing.to_stream(df,'morning_time')
+    elif segment == 2:
+        mask = df['Time_segment'] == 'مساء'
+        df = df.loc[mask]
+        response = preprocessing.to_stream(df,'night_time')
+    elif segment == 3:
+        mask = df['Time_segment'] == 'محايد'
+        df = df.loc[mask]
+        response = preprocessing.to_stream(df,'neutral_time')
+    else:
+        raise exeptions.wrong_segment
+
+    return response
