@@ -30,4 +30,6 @@ def to_stream(df, file_name):
 
     response.headers["Content-Disposition"] = f"attachment; filename={file_name}.csv"
 
+    response.headers["Access-Control-Expose-Headers"] = "Content-Disposition"
+
     return response
