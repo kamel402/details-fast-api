@@ -25,11 +25,11 @@ async def basket_analysis(file: UploadFile = File(...)):
             file_name, file_extension = os.path.splitext(file.filename)
             if file_extension == ".xlsx":
                 df = pd.read_excel(file.file._file)
-            else :
+            else:
                 df = pd.read_csv(file.file._file)
         except:
             raise exeptions.not_valid_file
-    
+
         # Preprocess data
         df = preprocessing.filter_data(df)
         # Generate products sheet
@@ -42,10 +42,11 @@ async def basket_analysis(file: UploadFile = File(...)):
     rules = basket.generate_rules(frequent_itemsets)
     # Convert Dataframe to json format
     data = rules.to_json(orient='records', force_ascii=False)
-    
+
     data = json.loads(data)
 
     return data
+
 
 @router.post('/download')
 async def basket_analysis(file: UploadFile = File(...)):
@@ -56,11 +57,11 @@ async def basket_analysis(file: UploadFile = File(...)):
             file_name, file_extension = os.path.splitext(file.filename)
             if file_extension == ".xlsx":
                 df = pd.read_excel(file.file._file)
-            else :
+            else:
                 df = pd.read_csv(file.file._file)
         except:
             raise exeptions.not_valid_file
-    
+
         # Preprocess data
         df = preprocessing.filter_data(df)
         # Generate products sheet
@@ -72,7 +73,6 @@ async def basket_analysis(file: UploadFile = File(...)):
     # Generate association rules
     rules = basket.generate_rules(frequent_itemsets)
 
-  
-    response = preprocessing.to_stream(rules,'basket_patterns')
+    response = preprocessing.to_stream(rules, 'basket_patterns')
 
     return response

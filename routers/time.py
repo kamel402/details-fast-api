@@ -20,11 +20,11 @@ async def time_classification(limit: Optional[int] = None, file: UploadFile = Fi
         file_name, file_extension = os.path.splitext(file.filename)
         if file_extension == ".xlsx":
             df = pd.read_excel(file.file._file)
-        else :
+        else:
             df = pd.read_csv(file.file._file)
     except:
         raise exeptions.not_valid_file
-    
+
     df = preprocessing.filter_data(df)
     # Calculate the invoice hour
     df = time.calculate_invoice_hour(df)
@@ -50,8 +50,9 @@ async def time_classification(limit: Optional[int] = None, file: UploadFile = Fi
         data = df.head(limit).to_json(orient='records', force_ascii=False)
 
     data = json.loads(data)
-    
+
     return data
+
 
 @router.post('/count')
 async def time_classification(file: UploadFile = File(...)):
@@ -59,7 +60,7 @@ async def time_classification(file: UploadFile = File(...)):
         file_name, file_extension = os.path.splitext(file.filename)
         if file_extension == ".xlsx":
             df = pd.read_excel(file.file._file)
-        else :
+        else:
             df = pd.read_csv(file.file._file)
     except:
         raise exeptions.not_valid_file
@@ -83,15 +84,16 @@ async def time_classification(file: UploadFile = File(...)):
     # df = time.drop_unnecessary_column(df)
 
     # Convert Dataframe to json format
-    df = df.groupby(['Time_segment'],as_index=False).agg({'CustomerID': 'count'}).rename(columns = {'CustomerID': 'count'})
+    df = df.groupby(['Time_segment'], as_index=False).agg(
+        {'CustomerID': 'count'}).rename(columns={'CustomerID': 'count'})
 
     # Convert Dataframe to json format
     data = df.to_json(orient='records', force_ascii=False)
 
-
     data = json.loads(data)
-    
+
     return data
+
 
 @router.post('/download/{segment}')
 async def time_classification(segment: int, file: UploadFile = File(...)):
@@ -99,11 +101,11 @@ async def time_classification(segment: int, file: UploadFile = File(...)):
         file_name, file_extension = os.path.splitext(file.filename)
         if file_extension == ".xlsx":
             df = pd.read_excel(file.file._file)
-        else :
+        else:
             df = pd.read_csv(file.file._file)
     except:
         raise exeptions.not_valid_file
-    
+
     df = preprocessing.filter_data(df)
     # Calculate the invoice hour
     df = time.calculate_invoice_hour(df)
@@ -114,19 +116,19 @@ async def time_classification(segment: int, file: UploadFile = File(...)):
     # Drop unnecessary column
 
     if segment == 0:
-        response = preprocessing.to_stream(df,'all_time')
+        response = preprocessing.to_stream(df, 'all_time')
     elif segment == 1:
         mask = df['Time_segment'] == 'صباح'
         df = df.loc[mask]
-        response = preprocessing.to_stream(df,'morning_time')
+        response = preprocessing.to_stream(df, 'morning_time')
     elif segment == 2:
         mask = df['Time_segment'] == 'مساء'
         df = df.loc[mask]
-        response = preprocessing.to_stream(df,'night_time')
+        response = preprocessing.to_stream(df, 'night_time')
     elif segment == 3:
         mask = df['Time_segment'] == 'محايد'
         df = df.loc[mask]
-        response = preprocessing.to_stream(df,'neutral_time')
+        response = preprocessing.to_stream(df, 'neutral_time')
     else:
         raise exeptions.wrong_segment
 

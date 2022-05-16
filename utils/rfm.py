@@ -59,6 +59,7 @@ def devide_into_4_categories(df, column, new_column_name):
 
     df[new_column_name] = df.apply(lambda row: category_label(row), axis=1)
 
+
 def devide_into_4_categories_minmax(df, column, new_column_name, max, min):
 
     period = (max - min) / 4
@@ -79,6 +80,7 @@ def devide_into_4_categories_minmax(df, column, new_column_name, max, min):
             return int(4)
 
     df[new_column_name] = df.apply(lambda row: category_label(row), axis=1)
+
 
 def devide_into_4_categoriesRecency(df, column, new_column_name):
     max = df[column].max()
@@ -102,6 +104,7 @@ def devide_into_4_categoriesRecency(df, column, new_column_name):
             return int(1)
 
     df[new_column_name] = df.apply(lambda row: category_label(row), axis=1)
+
 
 def devide_into_4_categoriesRecency_minmax(df, column, new_column_name, max, min):
 
@@ -133,9 +136,12 @@ def calculate_4_categories(df):
 
 
 def calculate_4_categories_minmax(df, minmax):
-    devide_into_4_categoriesRecency_minmax(df, 'recency_log', 'R', minmax[0],minmax[1])
-    devide_into_4_categories_minmax(df, 'frequency_log', 'F',minmax[2],minmax[3])
-    devide_into_4_categories_minmax(df, 'amount_log', 'M',minmax[4],minmax[5])
+    devide_into_4_categoriesRecency_minmax(
+        df, 'recency_log', 'R', minmax[0], minmax[1])
+    devide_into_4_categories_minmax(
+        df, 'frequency_log', 'F', minmax[2], minmax[3])
+    devide_into_4_categories_minmax(
+        df, 'amount_log', 'M', minmax[4], minmax[5])
     return df
 
 
@@ -218,5 +224,3 @@ def find_max_min(cs_df):
     minM = customer_history_df['amount_log'].min()
 
     return [maxR, minR, maxF, minF, maxM, minM]
-
-    

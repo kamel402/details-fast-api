@@ -1,4 +1,4 @@
-import uvicorn ##ASGI
+import uvicorn  # ASGI
 from fastapi import FastAPI
 from routers import basket, discount, rfm, season, time, store
 from fastapi.middleware.cors import CORSMiddleware
@@ -39,7 +39,4 @@ async def index():
 #    Will run on http://127.0.0.1:9000
 if __name__ == '__main__':
     uvicorn.run(app, host='127.0.0.1', port=9000)
-#uvicorn main:app --reload
-
-
-
+# uvicorn main:app --reload
