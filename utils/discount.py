@@ -23,8 +23,6 @@ def calculate_dicount(df):
     customer_history_df['percentege'] = (
         customer_history_df['number_of_discounts']/customer_history_df['frequency'])*100
 
-    print(customer_history_df['percentege'].max())
-
     return customer_history_df
 
 

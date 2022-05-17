@@ -40,8 +40,6 @@ def devide_into_4_categories(df, column, new_column_name):
 
     period = (max - min) / 4
 
-    print(new_column_name, max, min, period)
-
     cat1 = (min, min+period)
     cat2 = (cat1[1], cat1[1]+period)
     cat3 = (cat2[1], cat2[1]+period)

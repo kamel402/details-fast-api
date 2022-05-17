@@ -153,7 +153,6 @@ async def rfm_classification(file: UploadFile = File(...)):
 
         masked_df = masked_df.groupby(['general_segment'], as_index=False).agg(
             {'CustomerID': 'count'}).rename(columns={'CustomerID': 'count'})
-        print(masked_df['count'].iloc[0])
         low_counts.append(int(masked_df['count'].iloc[0]))
         if masked_df.shape[0] > 1:
             Middle_counts.append(int(masked_df['count'].iloc[1]))
