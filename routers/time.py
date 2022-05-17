@@ -121,11 +121,11 @@ async def time_classification(segment: int, file: UploadFile = File(...)):
         mask = df['Time_segment'] == 'صباح'
         df = df.loc[mask]
         response = preprocessing.to_stream(df, 'morning_time')
-    elif segment == 2:
+    elif segment == 3:
         mask = df['Time_segment'] == 'مساء'
         df = df.loc[mask]
         response = preprocessing.to_stream(df, 'night_time')
-    elif segment == 3:
+    elif segment == 2:
         mask = df['Time_segment'] == 'محايد'
         df = df.loc[mask]
         response = preprocessing.to_stream(df, 'neutral_time')

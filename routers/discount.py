@@ -92,15 +92,15 @@ async def discount_classification(segment: int, file: UploadFile = File(...)):
 
     if segment == 0:
         response = preprocessing.to_stream(df, 'all_discount')
-    elif segment == 1:
+    elif segment == 2:
         mask = df['Discount_segment'] == 'مهتم بالعروض اشترى اكثر من مرة'
         df = df.loc[mask]
         response = preprocessing.to_stream(df, 'interest_more_than_1_discount')
-    elif segment == 2:
+    elif segment == 3:
         mask = df['Discount_segment'] == 'مهتم بالعروض اشترى مرة وحدة فقط'
         df = df.loc[mask]
         response = preprocessing.to_stream(df, 'interest_1_discount')
-    elif segment == 3:
+    elif segment == 1:
         mask = df['Discount_segment'] == 'عادي'
         df = df.loc[mask]
         response = preprocessing.to_stream(df, 'normal_discount')
